@@ -1,14 +1,16 @@
 /// mock data for image buffer 
 /// read from  jpg file
 use std::{fs::File};
-
-pub fn mock_from_file(path:&str) -> Result<Vec<u8>> {
-
-    Ok(())
+use anyhow::Context;
+pub struct MockData {
+    width: u32,
+    height: u32,
+    data: Vec<u8>
 }
 
-fn  from_file<P:AsRef<Path>>(path:P) -> Resut<(u32,u32,Arc<Mmap>,Box<dyn std::error::Error>)> {
-    let file = File::open(&path);
+impl MockData {
+    fn from_jpg(&self)-> self {
 
-    Ok((0,0))
+    }
 }
+
