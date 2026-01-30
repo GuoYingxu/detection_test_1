@@ -1,0 +1,61 @@
+draw_bboxes.py 使用说明
+========================
+
+本脚本用于将推理得到的 bbox（如 pred_bboxes.json）绘制在原图上，生成可视化图片，便于人工检查和前端展示。
+
+一、依赖环境
+------------
+- Python 3.7+
+- opencv-python
+- numpy
+
+安装依赖：
+    pip install opencv-python numpy
+
+二、用法
+--------
+
+
+命令行示例：
+    python draw_bboxes.py --image 输入图片路径 --json pred_bboxes.json --out pred_bboxes_vis.jpg --score_thresh 0.8
+
+支持 pred_bboxes.json 为细粒度（12类）输出，脚本会自动聚合为三类（划痕、掉漆、异物）并按置信度过滤。
+
+参数说明：
+- --image   输入图片路径（必填，支持灰度或彩色）
+- --json    bbox json 路径（必填，通常为 infer_onnx.py 输出的 pred_bboxes.json）
+- --out     输出可视化图片路径（默认 pred_bboxes_vis.jpg）
+- --min_area 过滤面积小于该值的框（默认500，单位像素）
+- --max_boxes_per_class 每类最多绘制多少个框（默认200，0为不限制）
+- --thickness  矩形框线宽（默认2）
+- --no_label   不绘制类别标签
+- --score_thresh 只显示置信度高于该值的框（如 0.8，仅显示高置信度缺陷）
+
+
+三、输出说明
+------------
+- 支持细粒度（12类）输入，自动聚合为三类：
+    - 划痕(scratch)：类别id=1，黄色
+    - 掉漆/漆病(paint_defect)：类别id=2/3，橙色
+    - 异物(foreign_object)：其他类别id，品红色
+- 框的类别名和颜色会自动映射，无需手动指定。
+- 置信度(score)为该缺陷区域的平均概率，仅显示高于 --score_thresh 的框。
+
+四、示例
+--------
+    python draw_bboxes.py --image test.png --json pred_bboxes.json --out test_bboxes_vis.jpg
+    python draw_bboxes.py --image test.png --json pred_bboxes.json --out test_bboxes_vis.jpg --min_area 1000 --max_boxes_per_class 50
+    python draw_bboxes.py --image test.png --json pred_bboxes.json --out test_bboxes_vis.jpg --score_thresh 0.8
+    python draw_bboxes.py --image test.png --json pred_bboxes.json --out test_bboxes_vis.jpg --no_label
+
+五、常见问题
+-------------
+- 若图片或json路径错误会报 FileNotFoundError，请检查路径。
+- 输出图片保存失败会报 RuntimeError，通常是路径无写权限或磁盘满。
+- 框太多可用 --max_boxes_per_class 控制，太小可调低 --min_area。
+
+六、结果说明
+-------------
+- 终端会输出每类原始框数量和绘制参数，便于统计和调试。
+
+如有更多需求可随时扩展脚本参数。

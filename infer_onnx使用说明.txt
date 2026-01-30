@@ -1,0 +1,66 @@
+infer_onnx.py 使用说明
+====================
+
+本脚本用于对大尺寸图片进行滑窗推理，输出分割 mask 及每类缺陷的 bbox（json），适合前端渲染。
+
+一、依赖环境
+------------
+- Python 3.7+
+- onnxruntime
+- opencv-python
+- numpy
+
+安装依赖：
+    pip install onnxruntime opencv-python numpy
+
+二、用法
+--------
+
+
+
+命令行示例：
+    python infer_onnx.py --image 输入图片路径 --onnx unet.onnx --num_classes 12 --out pred_mask.png --json pred_bboxes.json
+
+⚠️ 本脚本始终输出细粒度（12类）结果，不再支持聚合参数。聚合和过滤请在 draw_bboxes.py 阶段完成。
+
+
+参数说明：
+- --image   输入图片路径（必填，支持大尺寸灰度图）
+- --onnx    ONNX模型路径（默认 unet.onnx）
+- --out     输出mask图片路径（默认 pred_mask.png）
+- --json    输出bbox json路径（默认 pred_bboxes.json）
+- --window  滑窗尺寸（默认1024）
+- --stride  滑窗步长（默认896，建议 window-128）
+- --num_classes 类别数（需与模型一致，细粒度模型通常为12）
+- --providers 推理执行后端：auto|cpu|cuda（默认 auto，脚本启动时会打印实际使用的 providers）
+
+
+三、输出说明
+------------
+1. mask图片：输出为细粒度类别（0为背景，1~12为各类缺陷），可用于后续聚合和可视化。
+2. bbox json：每类缺陷的所有外接矩形，格式如下：
+{
+    "1": [[x1, y1, x2, y2, score], ...],
+    "2": [[x1, y1, x2, y2, score], ...],
+    ...
+}
+score 为该缺陷区域的平均置信度（概率，0~1），可用于后续过滤和可视化。
+（注：脚本内部会对模型输出做 softmax 转成概率后再计算 score，确保范围为 0~1）
+
+四、常见问题
+-------------
+- 图片必须为灰度图（单通道），如为彩色请先转灰度
+- num_classes 必须与训练/导出模型一致
+- 若无GPU可自动用CPU
+
+五、示例
+--------
+    python infer_onnx.py --image 618_door_001234.jpg --onnx unet.onnx --num_classes 12 --out mask.png --json bboxes.json
+
+
+细粒度模型推理：
+    python infer_onnx.py --image test.png --onnx unet.onnx --num_classes 12 --out mask.png --json bboxes.json
+
+聚合和过滤请在 draw_bboxes.py 阶段完成。
+
+推理完成后，mask.png为分割结果，bboxes.json可直接传给前端渲染缺陷框。

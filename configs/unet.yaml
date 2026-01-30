@@ -1,0 +1,14 @@
+patch_size: 512
+stride: 256
+
+num_classes: 12
+in_channels: 1
+
+batch_size: 16
+epochs: 80
+learning_rate: 0.001
+
+positive_pixel_threshold: 0.01
+pos_neg_ratio: 1.0
+
+device: cuda
