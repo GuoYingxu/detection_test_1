@@ -289,6 +289,7 @@ dependencies = [
  "image",
  "jpeg-decoder",
  "memmap2",
+ "ndarray",
  "ort",
  "serde",
  "serde_json",

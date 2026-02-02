@@ -5,9 +5,9 @@ use memmap2::Mmap;
 /// read from  jpg file
 use std::{fs::File, io::Cursor, time::Instant};
 pub struct MockData {
-    width: u32,
-    height: u32,
-    data: Vec<u8>,
+   pub width: u32,
+   pub height: u32,
+   pub data: Vec<u8>,
 }
 
 impl MockData {

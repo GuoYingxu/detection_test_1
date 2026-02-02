@@ -6,13 +6,13 @@ use serde_json;
  
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Rect { 
-    pub x:f32,
-    pub y:f32,
-    pub width:f32,
-    pub height:f32,
+    pub x:usize,
+    pub y:usize,
+    pub width:usize,
+    pub height:usize,
 }
 impl Rect {
-    pub fn new(x:f32,y:f32,width:f32,height:f32)->Self {
+    pub fn new(x:usize,y:usize,width:usize,height:usize)->Self {
         Self{x,y,width,height}
     }
 }
@@ -58,10 +58,10 @@ impl LabelConfig {
                 let width = (p2[0] - p1[0]).abs();
                 let height = (p2[1] - p1[1]).abs();
 
-                let x = p1[0].min(p2[0]);
-                let y = p1[1].min(p2[1]);
+                let x = p1[0].min(p2[0]).floor() as usize;
+                let y = p1[1].min(p2[1]).ceil() as  usize;
 
-                Ok(Rect::new(x,y,width,height))
+                Ok(Rect::new(x,y,width.ceil() as usize,height.ceil() as  usize))
             }).collect::<Result<Vec<_>>>()?;
             self.ignore_rects = rects;
             Ok(self)
@@ -80,7 +80,6 @@ impl LabelConfig {
                         shape.points.len()
                         )));
                 }
-                println!("shape:::: {:?}",shape.points);
                 //检查每个点是否包含 xy 两个坐标
                 let p1 = &shape.points[0];
                 let p2 = &shape.points[1];
@@ -89,13 +88,13 @@ impl LabelConfig {
                 }
 
                 // 计算宽高
-                let width = (p2[0] - p1[0]).abs();
+                let width = (p2[0] - p1[0]).abs() ;
                 let height = (p2[1] - p1[1]).abs();
 
-                let x = p1[0].min(p2[0]);
-                let y = p1[1].min(p2[1]);
+                let x = p1[0].min(p2[0]).floor() as  usize;
+                let y = p1[1].min(p2[1]).ceil() as usize;
 
-                Ok(Rect::new(x,y,width,height))
+                Ok(Rect::new(x,y,width.ceil() as usize,height.ceil() as usize))
             }).collect::<Result<Vec<_>>>()?;
             self.roi_rects = rects;
             Ok(self)
